@@ -235,7 +235,7 @@ class TaskManagerApp(ctk.CTk):
 
         self.title("Task Manager")
         self.resizable(False, False)
-        self.iconbitmap("icons/icon1.ico")
+        self.iconbitmap("../icons/icon1.ico")
 
         self.data = RBTree()
 
