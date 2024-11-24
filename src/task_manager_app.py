@@ -28,7 +28,7 @@ class Button(ctk.CTkButton):
 class AddButton(Button):
     def __init__(self, master):
         super(AddButton, self).__init__(master=master, text="")
-        self.img = PIL.Image.open("icons/plus.png").convert("RGBA")
+        self.img = PIL.Image.open("../icons/plus.png").convert("RGBA")
         self.ico = ctk.CTkImage(self.img)
         self.configure(command=self.add_task_action, image=self.ico, width=10, height=10)
         self.parent = master
@@ -60,7 +60,7 @@ class AddButton(Button):
 class DeleteButton(Button):
     def __init__(self, master):
         super(DeleteButton, self).__init__(master=master, text="")
-        self.img = PIL.Image.open("icons/minus.png").convert("RGBA")
+        self.img = PIL.Image.open("../icons/minus.png").convert("RGBA")
         self.ico = ctk.CTkImage(self.img)
         self.configure(command=self.delete_task_action, image=self.ico, width=10, height=10)
         self.parent = master
@@ -87,7 +87,7 @@ class DeleteButton(Button):
 class FindButton(Button):
     def __init__(self, master):
         super(FindButton, self).__init__(master=master, text="")
-        self.img = PIL.Image.open("icons/find.png").convert("RGBA")
+        self.img = PIL.Image.open("../icons/find.png").convert("RGBA")
         self.ico = ctk.CTkImage(self.img)
         self.configure(command=self.find_task_action, image=self.ico, width=10, height=10)
         self.parent = master
@@ -110,7 +110,7 @@ class FindButton(Button):
 class UpdateButton(Button):
     def __init__(self, master):
         super(UpdateButton, self).__init__(master=master, text="")
-        self.img = PIL.Image.open("icons/update.png").convert("RGBA")
+        self.img = PIL.Image.open("../icons/update.png").convert("RGBA")
         self.ico = ctk.CTkImage(self.img)
         self.configure(command=self.update_button_action, image=self.ico, width=10, height=10)
         self.parent = master
