@@ -35,16 +35,16 @@ class RBNode:
 
 class RBTree:
     """ Red-Black tree implementation """
-    TNULL = RBNode(0, "", "black")
+    nil = RBNode(0, "", "black")
 
     def __init__(self):
-        self.root = self.TNULL
+        self.root = self.nil
 
     def search(self, value: int):
         """ searching for node with val == value """
         cur_node = self.root
         while cur_node is not None:
-            if cur_node == self.TNULL or value == cur_node.value:
+            if cur_node == self.nil or value == cur_node.value:
                 return cur_node
             elif value < cur_node.value:
                 cur_node = cur_node.left
@@ -54,13 +54,13 @@ class RBTree:
     def insert(self, value: int, task: str):
         """ inserting new node into the tree """
         node = RBNode(value, task)
-        node.left = self.TNULL
-        node.right = self.TNULL
+        node.left = self.nil
+        node.right = self.nil
 
         parent = None
         cur_node = self.root
 
-        while cur_node != self.TNULL:
+        while cur_node != self.nil:
             parent = cur_node
             if node.value < cur_node.value:
                 cur_node = cur_node.left
@@ -125,16 +125,16 @@ class RBTree:
 
         node_to_delete = self.search(value)
 
-        if node_to_delete == self.TNULL:
+        if node_to_delete == self.nil:
             return
 
         y = node_to_delete
         y_original_color = y.color
 
-        if node_to_delete.left == self.TNULL:
+        if node_to_delete.left == self.nil:
             x = node_to_delete.right
             self.__replace_node(node_to_delete, node_to_delete.right)
-        elif node_to_delete.right == self.TNULL:
+        elif node_to_delete.right == self.nil:
             x = node_to_delete.left
             self.__replace_node(node_to_delete, node_to_delete.left)
         else:
@@ -258,7 +258,7 @@ class RBTree:
 
     def __find_min(self, node: RBNode) -> RBNode:
         """ finds minimum val node in a tree """
-        while node.left != self.TNULL:
+        while node.left != self.nil:
             node = node.left
         return node
 
@@ -270,7 +270,7 @@ class RBTree:
         yield from self.__pre_order(node.right)
 
     def __in_order(self, node: RBNode):
-        if not node:
+        if not node or node == self.nil:
             return
         yield from self.__in_order(node.left)
         yield node

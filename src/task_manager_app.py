@@ -49,7 +49,7 @@ class AddButton(Button):
 
         collision_check = self.parent.parent.parent.data.search(int(priority))
 
-        if collision_check == RBTree.TNULL:
+        if collision_check == RBTree.nil:
             self.parent.parent.parent.data.insert(int(priority), description)
             self.parent.description_entry.configure(placeholder_text=self.parent.description_entry.add_success)
         else:
@@ -76,7 +76,7 @@ class DeleteButton(Button):
 
         res = self.parent.parent.parent.data.search(int(priority))
 
-        if res == RBTree.TNULL:
+        if res == RBTree.nil:
             self.parent.description_entry.configure(placeholder_text=self.parent.description_entry.error_output)
             return
 
@@ -101,7 +101,7 @@ class FindButton(Button):
         self.parent.description_entry.delete(0, ctk.END)
 
         res = self.parent.parent.parent.data.search(int(priority))
-        if res != RBTree.TNULL:
+        if res != RBTree.nil:
             self.parent.description_entry.insert(0, res)
         else:
             self.parent.description_entry.configure(placeholder_text=self.parent.description_entry.error_output)
@@ -191,16 +191,16 @@ class DisplayTree(ctk.CTkFrame):
         self.canvas.get_tk_widget().pack(fill=ctk.BOTH, expand=True)
 
     def RBT_to_graph(self, node, pos_x, pos_y, level=0, x_offset=2):
-        if node == RBTree.TNULL:
+        if node == RBTree.nil:
             return
         self.graph.add_node(node.value, color=node.color)
         self.coords[node.value] = (pos_x, pos_y)
         self.labels[node.value] = node.task
 
-        if node.left != RBTree.TNULL:
+        if node.left != RBTree.nil:
             self.graph.add_edge(node.value, node.left.value)
             self.RBT_to_graph(node.left, pos_x - x_offset, pos_y - 1, level + 1, x_offset / 2)
-        if node.right != RBTree.TNULL:
+        if node.right != RBTree.nil:
             self.graph.add_edge(node.value, node.right.value)
             self.RBT_to_graph(node.right, pos_x + x_offset, pos_y - 1, level + 1, x_offset / 2)
 
