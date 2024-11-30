@@ -2,6 +2,7 @@ class RBNode:
     """ Red-Black tree node implementation """
 
     def __init__(self, value: int, task: str, color="red"):
+        # new nodes by default has to be red
         self.value = value
         self.task = task
         self.color = color
@@ -11,12 +12,14 @@ class RBNode:
 
     def grandparent(self):
         """ returns grandparent of a node if exists """
+
         if self.parent is None:
             return None
         return self.parent.parent
 
     def sibling(self):
         """ returns sibling of a node if exists """
+
         if self.parent is None:
             return None
         if self == self.parent.left:
@@ -25,6 +28,7 @@ class RBNode:
 
     def uncle(self):
         """ returns uncle of a node if exists """
+
         if self.parent is None:
             return None
         return self.parent.sibling()
@@ -35,13 +39,17 @@ class RBNode:
 
 class RBTree:
     """ Red-Black tree implementation """
+
+    # nil node for tree
     nil = RBNode(0, "", "black")
 
     def __init__(self):
+        # by default tree root is black
         self.root = self.nil
 
     def search(self, value: int):
         """ searching for node with val == value """
+
         cur_node = self.root
         while cur_node is not None:
             if cur_node == self.nil or value == cur_node.value:
@@ -53,13 +61,17 @@ class RBTree:
 
     def insert(self, value: int, task: str):
         """ inserting new node into the tree """
+
         node = RBNode(value, task)
+
+        # leaves always has to be black
         node.left = self.nil
         node.right = self.nil
 
         parent = None
         cur_node = self.root
 
+        # looking for place to insert
         while cur_node != self.nil:
             parent = cur_node
             if node.value < cur_node.value:
@@ -68,8 +80,11 @@ class RBTree:
                 cur_node = cur_node.right
 
         node.parent = parent
+
+        # no elements in tree
         if parent is None:
             self.root = node
+        # changing parent ref according to parent value
         elif node.value < parent.value:
             parent.left = node
         else:
@@ -79,116 +94,155 @@ class RBTree:
             node.color = "black"
             return
 
-        if node.parent.parent is None:
+        # in total 3 elements -> no need to balance
+        if node.grandparent() is None:
             return
 
         self.balance_insert(node)
 
     def balance_insert(self, new_node: RBNode):
-        """ red node can not have a red child """
+        """ fixing violations after inserting a node """
+
+        # red node can not have a red child
         while new_node.parent.color == "red":
-            if new_node.parent == new_node.parent.parent.right:
-                u = new_node.parent.parent.left
+            if new_node.parent == new_node.grandparent().right:
+                u = new_node.uncle()  # parent parent left
                 if u.color == "red":
                     u.color = "black"
                     new_node.parent.color = "black"
-                    new_node.parent.parent.color = "red"
-                    new_node = new_node.parent.parent
+                    new_node.grandparent().color = "red"  # parent parent
+                    new_node = new_node.grandparent()  # parent parent
                 else:
                     if new_node == new_node.parent.left:
                         new_node = new_node.parent
                         self.__rotate_right(new_node)
                     new_node.parent.color = "black"
-                    new_node.parent.parent.color = "red"
-                    self.__rotate_left(new_node.parent.parent)
+                    new_node.grandparent().color = "red"  # parent parent
+                    self.__rotate_left(new_node.grandparent())  # parent parent
             else:
-                u = new_node.parent.parent.right
+                u = new_node.uncle()  # parent parent right
 
                 if u.color == "red":
                     u.color = "black"
                     new_node.parent.color = "black"
-                    new_node.parent.parent.color = "red"
-                    new_node = new_node.parent.parent
+                    new_node.grandparent().color = "red"  # parent parent
+                    new_node = new_node.grandparent()  # parent parent
                 else:
                     if new_node == new_node.parent.right:
                         new_node = new_node.parent
                         self.__rotate_left(new_node)
                     new_node.parent.color = "black"
-                    new_node.parent.parent.color = "red"
-                    self.__rotate_right(new_node.parent.parent)
+                    new_node.grandparent().color = "red"  # parent parent
+                    self.__rotate_right(new_node.grandparent())  # parent parent
             if new_node == self.root:
                 break
+        # root always has to be black
         self.root.color = "black"
 
     def delete(self, value: int):
-        """ deleting node with val == value if node exists """
+        """Deleting node with val == value if node exists"""
 
+        # looking for node to delete
         node_to_delete = self.search(value)
 
+        # node to delete not found
         if node_to_delete == self.nil:
             return
 
-        y = node_to_delete
-        y_original_color = y.color
+        # save original color of node to delete
+        original_color = node_to_delete.color
 
+        # Case 1: node has no left child -> replace with right child
         if node_to_delete.left == self.nil:
             x = node_to_delete.right
-            self.__replace_node(node_to_delete, node_to_delete.right)
+            self.__replace_node(node_to_delete, x)
+
+        # Case 2: node has no right child -> replace with left child
         elif node_to_delete.right == self.nil:
             x = node_to_delete.left
-            self.__replace_node(node_to_delete, node_to_delete.left)
+            self.__replace_node(node_to_delete, x)
+
+        # Case 3: node has two children -> replace with successor
         else:
+            # finding min element in right subtree
             successor = self.__find_min(node_to_delete.right)
-            y_original_color = successor.color
+
+            # saving its color
+            original_color = successor.color
+
+            # saving its right child
             x = successor.right
-            if successor.parent == node_to_delete:
-                x.parent = successor
-            else:
-                self.__replace_node(successor, successor.right)
+
+            # if the successor has right child we'll lose him -> do not forget to swap successor with its right child
+            if successor.parent != node_to_delete:
+                self.__replace_node(successor, x)
                 successor.right = node_to_delete.right
                 successor.right.parent = successor
 
+            # now replace the successor with node to delete
             self.__replace_node(node_to_delete, successor)
             successor.left = node_to_delete.left
             successor.left.parent = successor
             successor.color = node_to_delete.color
 
-        if y_original_color == "black":
+        # if original node was black -> we need to balance the tree
+        if original_color == "black":
             self.__balance_delete(x)
 
     def __balance_delete(self, node: RBNode):
-        while node != self.root and node.color == "black":
-            if node == node.parent.left:
-                s = node.parent.right
-                if s.color == "red":
-                    s.color = "black"
-                    node.parent.color = "red"
-                    self.__rotate_left(node.parent)
-                    s = node.parent.right
+        """ fixing violations after removing a node """
 
+        while node != self.root and node.color == "black":
+            # Case 1: we are on the left side
+            if node == node.parent.left:
+                s = node.sibling()  # parent right
+
+                # by the default our node color is black then our sibling has to be black too
+                if s.color == "red":
+                    # making sibling black too
+                    s.color = "black"
+
+                    # our common parent has to be red then
+                    node.parent.color = "red"
+
+                    # do the left rotation to make root become black
+                    self.__rotate_left(node.parent)
+
+                    # now our sibling has changed so look at our new sibling
+                    s = node.sibling()  # parent right
+
+                # black children has to have red parent
                 if s.left.color == "black" and s.right.color == "black":
+                    # parent color
                     s.color = "red"
+
+                    # going upwards to in the root direction
                     node = node.parent
+
                 else:
+                    # parent is black and left children is red -> look at the right children
                     if s.right.color == "black":
                         s.left.color = "black"
                         s.color = "red"
                         self.__rotate_right(s)
-                        s = node.parent.right
+                        s = node.sibling()  # parent right
 
                     s.color = node.parent.color
                     node.parent.color = "black"
                     s.right.color = "black"
                     self.__rotate_left(node.parent)
+
+                    # ending while loop
                     node = self.root
             else:
-                s = node.parent.left
+                s = node.sibling()  # parent left
                 if s.color == "red":
                     s.color = "black"
                     node.parent.color = "red"
                     self.__rotate_right(node.parent)
-                    s = node.parent.left
+                    s = node.sibling()  # parent left
 
+                # red node has to have black children
                 if s.right.color == "black" and s.right.color == "black":
                     s.color = "red"
                     node = node.parent
@@ -197,17 +251,20 @@ class RBTree:
                         s.right.color = "black"
                         s.color = "red"
                         self.__rotate_left(s)
-                        s = node.parent.left
+                        s = node.sibling()  # parent left
 
                     s.color = node.parent.color
                     node.parent.color = "black"
                     s.left.color = "black"
                     self.__rotate_right(node.parent)
+                    # ending while loop
                     node = self.root
+        # root always has to be black
         node.color = "black"
 
     def __rotate_right(self, node: RBNode):
-        # right rotation around node
+        """ right rotation around node """
+
         left_child = node.left
         node.left = left_child.right
 
@@ -228,6 +285,7 @@ class RBTree:
 
     def __rotate_left(self, node: RBNode):
         """ left rotation around node """
+
         right_child = node.right
         node.right = right_child.left
 
@@ -285,3 +343,6 @@ class RBTree:
 
     def __iter__(self):
         return self.__in_order(self.root)
+
+    def __len__(self):
+        return sum(1 for _ in self.__in_order(self.root))

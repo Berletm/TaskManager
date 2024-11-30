@@ -1,6 +1,6 @@
 import PIL.Image
 import ctypes
-from rbt import RBTree
+from structs.rbt import RBTree
 import customtkinter as ctk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt

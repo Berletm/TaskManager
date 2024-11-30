@@ -1,8 +1,16 @@
 import pytest
-import sys
+import random
+import string
+from TaskManager.src.structs.rbt import RBTree
 
-sys.path.append(r"C:\Users\arafa\PycharmProjects\TaskManager")
-from TaskManager.src.rbt import RBTree
+
+def rand_description_generator(size=3):
+    return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(size))
+
+
+def add_rand_tasks(rbt: RBTree, n_tasks: int):
+    for priority in range(n_tasks):
+        rbt.insert(len(rbt) + priority + 1, rand_description_generator())
 
 
 @pytest.mark.parametrize("data, expected", [([(1, "a"), (2, "b"), (3, "c"), (4, "d")],
